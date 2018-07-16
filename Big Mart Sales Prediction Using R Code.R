@@ -82,11 +82,13 @@ p4 = ggplot(combi %>% group_by(Item_Type) %>% summarise(Count = n())) +
   geom_label(aes(Item_Type, Count, label = Count), vjust = 0.5) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))+
   ggtitle("Item_Type")
+
 # plot for Outlet_Identifier
 p5 = ggplot(combi %>% group_by(Outlet_Identifier) %>% summarise(Count = n())) + 
   geom_bar(aes(Outlet_Identifier, Count), stat = "identity", fill = "coral1") +
   geom_label(aes(Outlet_Identifier, Count, label = Count), vjust = 0.5) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
 # plot for Outlet_Size
 p6 = ggplot(combi %>% group_by(Outlet_Size) %>% summarise(Count = n())) + 
   geom_bar(aes(Outlet_Size, Count), stat = "identity", fill = "coral1") +
@@ -116,15 +118,18 @@ plot_grid(p7, p8, ncol = 2)
 #we'll explore the independent variables with respect to the target variable
 
 train = combi[1:nrow(train)] # extracting train data from the combined data
+
 #Target Variable vs Independent Numerical Variables
 # Item_Weight vs Item_Outlet_Sales
 p9 = ggplot(train) + 
   geom_point(aes(Item_Weight, Item_Outlet_Sales), colour = "violet", alpha = 0.3) +
   theme(axis.title = element_text(size = 8.5))
+
 # Item_Visibility vs Item_Outlet_Sales
 p10 = ggplot(train) + 
   geom_point(aes(Item_Visibility, Item_Outlet_Sales), colour = "violet", alpha = 0.3) +
   theme(axis.title = element_text(size = 8.5))
+
 # Item_MRP vs Item_Outlet_Sales
 p11 = ggplot(train) + 
   geom_point(aes(Item_MRP, Item_Outlet_Sales), colour = "violet", alpha = 0.3) +
@@ -140,12 +145,14 @@ p12 = ggplot(train) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1),
         axis.text = element_text(size = 6),
         axis.title = element_text(size = 8.5))
+
 # Item_Fat_Content vs Item_Outlet_Sales
 p13 = ggplot(train) + 
   geom_violin(aes(Item_Fat_Content, Item_Outlet_Sales), fill = "magenta") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1),
         axis.text = element_text(size = 8),
         axis.title = element_text(size = 8.5))
+
 # Outlet_Identifier vs Item_Outlet_Sales
 p14 = ggplot(train) + 
   geom_violin(aes(Outlet_Identifier, Item_Outlet_Sales), fill = "magenta") +
@@ -218,6 +225,7 @@ ggplot(combi) + geom_histogram(aes(Item_Visibility), bins = 100)
 
 perishable = c("Breads", "Breakfast", "Dairy", "Fruits and Vegetables", "Meat", "Seafood")
 non_perishable = c("Baking Goods", "Canned", "Frozen Foods", "Hard Drinks", "Health and Hygiene", "Household", "Soft Drinks")
+
 # create a new feature 'Item_Type_new'
 combi[,Item_Type_new := ifelse(Item_Type %in% perishable, "perishable", ifelse(Item_Type %in% non_perishable, "non_perishable", "not_sure"))]
 
@@ -232,9 +240,11 @@ combi[,Item_category := substr(combi$Item_Identifier, 1, 2)]
 #Outlet_Years (years of operation) and price_per_unit_wt (price per unit weight).
 
 combi$Item_Fat_Content[combi$Item_category == "NC"] = "Non-Edible"
+
 # years of operation for outlets
 combi[,Outlet_Years := 2013 - Outlet_Establishment_Year]
 combi$Outlet_Establishment_Year = as.factor(combi$Outlet_Establishment_Year)
+
 # Price per unit weight
 combi[,price_per_unit_wt := Item_MRP/Item_Weight]
 
@@ -404,5 +414,3 @@ xgb_model = xgb.train(data = dtrain, params = param_list, nrounds = 430)
 var_imp = xgb.importance(feature_names = setdiff(names(train), c("Item_Identifier", "Item_Outlet_Sales")), 
                          model = xgb_model)
 xgb.plot.importance(var_imp)
-
-
